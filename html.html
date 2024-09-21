@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+
+    <div class="container">
+        <h1>Event Management</h1>
+        <form id="eventForm">
+            <label for="eventName">Event Name:</label>
+            <input type="text" id="eventName" required>
+            <label for="eventDate">Event Date:</label>
+            <input type="date" id="eventDate" required>
+            <label for="eventLocation">Location:</label>
+            <input type="text" id="eventLocation" required>
+            <button type="submit" value="submit" class="sub" id="submit">Submit</button>
+        </form>
+        <div id="eventList">
+            <h2>Upcoming Events:</h2>
+            <ul id="events"></ul>
+        </div>
+    </div>
+    
+    <script type="module">
+        
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+        // configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBBB1_1z99UfeMgzNBfzs8VDkBx7BUa8f4",
+            authDomain: "eventmanagement-ac2df.firebaseapp.com",
+            projectId: "eventmanagement-ac2df",
+            storageBucket: "eventmanagement-ac2df.appspot.com",
+            messagingSenderId: "198345091732",
+            appId: "1:198345091732:web:0776b3d5a3568c18a5a281"
+        };
+
+        // Initialize
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Submission event
+        document.getElementById('eventForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const eventName = document.getElementById('eventName').value;
+            const eventDate = document.getElementById('eventDate').value;
+            const eventLocation = document.getElementById('eventLocation').value;
+
+            // Reference in database
+            const eventRef = ref(db, 'events/' + eventName);
+
+            // Save data
+            set(eventRef, {
+                eventName: eventName,
+                eventDate: eventDate,
+                eventLocation: eventLocation
+            })
+            .then(() => {
+                alert("Event added successfully!");
+                document.getElementById('eventForm').reset(); // Clear form fields
+                loadEvents(); // Reload event list
+            })
+            .catch((error) => {
+                alert("Failed to add event: " + error.message);
+            });
+        });
+
+        // Function to load events from Firebase
+        function loadEvents() {
+            const eventsRef = ref(db, 'events');
+            onValue(eventsRef, (snapshot) => {
+                const eventsList = document.getElementById('events');
+                eventsList.innerHTML = ''; // Clear the existing list
+
+                snapshot.forEach((childSnapshot) => {
+                    const event = childSnapshot.val();
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${event.eventName} - ${event.eventDate} - ${event.eventLocation}`;
+                    
+                    // Delete button
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.addEventListener('click', () => {
+                        deleteEvent(childSnapshot.key); // Delete event button
+                    });
+
+                    listItem.appendChild(deleteButton);
+                    eventsList.appendChild(listItem);
+                });
+            });
+        }
+
+        // Function to delete an event from Firebase
+        function deleteEvent(eventKey) {
+            const eventRef = ref(db, 'events/' + eventKey);
+            remove(eventRef)
+            .then(() => {
+                alert("Event deleted successfully!");
+                loadEvents(); // Reload event list
+            })
+            .catch((error) => {
+                alert("Failed to delete event: " + error.message);
+            });
+        }
+
+        loadEvents();
+    </script>
+</body>
+</html>
