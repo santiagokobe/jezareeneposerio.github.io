@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+    <div class="snow"></div>
+
+    <div class="container">
+        <h1>School Event Management</h1>
+        <form id="eventForm">
+            <label for="eventName">Event Name:</label>
+            <input type="text" id="eventName" required>
+            <label for="eventDate">Event Date:</label>
+            <input type="date" id="eventDate" required>
+            <label for="eventLocation">Location:</label>
+            <input type="text" id="eventLocation" required>
+            <label for="otherInfo">Other Message or Info:</label>
+            <input type="text" id="otherInfo">
+            <button type="submit" value="submit" class="sub" id="submit">Submit</button>
+        </form>
+        <div id="message">
+            <p>Your submitted events will appear here!</p>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+        // configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBBB1_1z99UfeMgzNBfzs8VDkBx7BUa8f4",
+            authDomain: "eventmanagement-ac2df.firebaseapp.com",
+            projectId: "eventmanagement-ac2df",
+            storageBucket: "eventmanagement-ac2df.appspot.com",
+            messagingSenderId: "198345091732",
+            appId: "1:198345091732:web:0776b3d5a3568c18a5a281"
+        };
+
+        // Initialize
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Submission event
+        document.getElementById('eventForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const eventName = document.getElementById('eventName').value;
+            const eventDate = document.getElementById('eventDate').value;
+            const eventLocation = document.getElementById('eventLocation').value;
+            const otherInfo = document.getElementById('otherInfo').value; // Get other info
+
+            // Reference in database
+            const eventRef = ref(db, 'events/' + eventName);
+
+            // Save data
+            set(eventRef, {
+                eventName: eventName,
+                eventDate: eventDate,
+                eventLocation: eventLocation,
+                otherInfo: otherInfo // Save other info
+            })
+            .then(() => {
+                alert("Event added successfully!");
+                document.getElementById('eventForm').reset(); // Clear form fields
+                displayMessage(eventName, eventDate, eventLocation); // Display message
+            })
+            .catch((error) => {
+                alert("Failed to add event: " + error.message);
+            });
+        });
+
+        // Function to display message
+        function displayMessage(eventName, eventDate, eventLocation) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<p>Event "${eventName}" on ${eventDate} at ${eventLocation} has been added!</p>`;
+            
+            // Set a timeout to revert the message
+            setTimeout(() => {
+                messageDiv.innerHTML = `<p>Your submitted events will appear here!</p>`;
+            }, 4000); // 4 seconds
+        }
+    </script>
+</body>
+</html>
