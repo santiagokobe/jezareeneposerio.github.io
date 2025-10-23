@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Webpage to Jezareene Poserio</title>
+<style>
+
+:root {
+  --bg: #0b0e17;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --accent: #00bfff;
+  --text: #e6f0ff;
+  --highlight: #58f0ff;
+}
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+header {
+  position: fixed;
+  width: 100%;
+  background: rgba(10,10,25,0.85);
+  backdrop-filter: blur(8px);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  border-bottom: 1px solid var(--accent);
+}
+header h1 { color: var(--highlight); font-size: 1.3rem; }
+nav a {
+  margin: 0 0.8rem;
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+nav a:hover { color: var(--highlight); }
+section {
+  padding: 6rem 2rem 4rem;
+  max-width: 1000px;
+  margin: auto;
+}
+.hero {
+  text-align: center;
+  margin-top: 3rem;
+}
+.hero h2 {
+  color: var(--highlight);
+  font-size: 2rem;
+}
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.games {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--accent);
+  border-radius: 15px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0,191,255,0.2);
+  transition: transform 0.3s;
+}
+.card:hover { transform: translateY(-5px); }
+.card button {
+  margin-top: 1rem;
+  padding: 0.5rem 1.2rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.card button:hover { background: var(--highlight); }
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+.modal-content {
+  background: #0f1626;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 1rem;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+.close {
+  color: var(--accent);
+  float: right;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+canvas {
+  background: #0b1a2a;
+  border: 1px solid var(--highlight);
+  border-radius: 10px;
+  margin-top: 1rem;
+}
+
+#play-section {
+  text-align: center;
+}
+footer {
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.9rem;
+  color: #a9c9ff;
+}
+@media(max-width:600px){
+  header { flex-direction: column; }
+  nav { margin-top: 0.5rem; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Jezareene Poserio</h1>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#games">Games</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<section class="hero" id="home">
+  <h2>Welcome to My Game World!</h2>
+  <p>Explore my creations, play my sample game, and discover the world of fun and innovation I’m building.</p>
+</section>
+
+<section id="games">
+  <h2>🎮 My Games</h2>
+  <div class="games">
+    <div class="card">
+      <h3>Sample Game</h3>
+      <p>Click the targets and score points! Try to beat your high score.</p>
+      <button id="openModal">Play Now</button>
+    </div>
+    <div class="card">
+      <h3>Coming Soon</h3>
+      <p>More exciting games are on the way!</p>
+    </div>
+  </div>
+</section>
+
+
+<div id="gameModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeModal">&times;</span>
+    <h3>Play the Game</h3>
+    <canvas id="gameCanvas" width="300" height="300"></canvas>
+    <p id="score">Score: 0 | High Score: 0</p>
+  </div>
+</div>
+
+<section id="play-section">
+  <h2>🚀 Play My Game Directly Here</h2>
+  <canvas id="gameCanvas2" width="320" height="320"></canvas>
+  <p id="score2">Score: 0 | High Score: 0</p>
+</section>
+
+<section id="about">
+  <h2>About Me</h2>
+  <p>I’m Jezareene Poserio, a passionate game developer and creative thinker who loves combining technology with imagination. This site is my personal space to showcase projects and share my journey in gaming development.</p>
+</section>
+
+<section id="contact">
+  <h2>Contact</h2>
+  <p>Feel free to reach out for collaborations or feedback!</p>
+  <p>Email: <a href="mailto:jezareeneposerio@gmail.com" style="color:var(--highlight);">jezareeneposerio@gmail.com</a></p>
+</section>
+
+<footer>© 2025 Jezareene Poserio. All rights reserved.</footer>
+
+<script>
+
+function initGame(canvasId, scoreId){
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext("2d");
+  let score = 0;
+  let high = localStorage.getItem(canvasId+"_high") || 0;
+  let target = {x: Math.random()*280, y: Math.random()*280, r: 15};
+  const scoreEl = document.getElementById(scoreId);
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "#00bfff";
+    ctx.beginPath();
+    ctx.arc(target.x, target.y, target.r, 0, Math.PI*2);
+    ctx.fill();
+    scoreEl.textContent = `Score: ${score} | High Score: ${high}`;
+  }
+  canvas.addEventListener("click", (e)=>{
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    const dist = Math.hypot(x-target.x, y-target.y);
+    if(dist < target.r){
+      score++;
+      if(score > high){ high = score; localStorage.setItem(canvasId+"_high", high); }
+      target.x = Math.random()*280; target.y = Math.random()*280;
+    } else { score = 0; }
+    draw();
+  });
+  draw();
+}
+initGame("gameCanvas2","score2");
+
+const modal = document.getElementById("gameModal");
+document.getElementById("openModal").onclick = ()=>{ modal.style.display="flex"; initGame("gameCanvas","score"); };
+document.getElementById("closeModal").onclick = ()=>{ modal.style.display="none"; };
+window.onclick = (e)=>{ if(e.target==modal) modal.style.display="none"; };
+</script>
+</body>
+</html>
